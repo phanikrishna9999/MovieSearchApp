@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProMovieStream - Movies</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&family=Roboto:wght@400&display=swap" rel="stylesheet">
+    <style>
+        /* Base Styling */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #111111;
+            color: white;
+            font-family: 'Roboto', sans-serif;
+            overflow-x: hidden;
+        }
+
+        a {
+            text-decoration: none;
+            color: #ff4757;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: #1f1f1f;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 50px;
+            position: fixed;
+            width: 100%;
+            z-index: 10;
+        }
+
+        .navbar h1 {
+            color: #ff4757;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        /* Movie List Section */
+        .movie-list-section {
+            padding: 120px 50px 50px 50px;
+        }
+
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .movie-card {
+            background-color: #1f1f1f;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .movie-card:hover {
+            transform: scale(1.05);
+        }
+
+        .movie-card img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+
+        .movie-card h3 {
+            padding: 15px;
+            font-size: 18px;
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            text-align: center;
+            background-color: #333;
+        }
+
+        /* Modal Styles */
+        .movie-details-modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #333;
+            padding: 30px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 800px;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .close {
+            color: white;
+            font-size: 28px;
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            cursor: pointer;
+        }
+
+        .modal-content h2 {
+            margin-bottom: 15px;
+            font-family: 'Montserrat', sans-serif;
+            color: #ff4757;
+        }
+
+        .modal-content p {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+
+        .modal-content strong {
+            color: #ff4757;
+        }
+
+        /* Trailer Button Styles */
+        .trailer-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #ff4757;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+            margin-top: 15px;
+        }
+
+        .trailer-btn:hover {
+            background-color: #e63946;
+        }
+
+        .trailer-btn:focus {
+            outline: none;
+        }
+
+        /* Footer Section */
+        footer {
+            background-color: #1f1f1f;
+            padding: 40px 50px;
+            color: #999;
+            margin-top: 30px;
+        }
+
+        footer ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        footer ul li {
+            font-size: 14px;
+        }
+
+        footer ul li a {
+            color: #999;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+
+        footer ul li a:hover {
+            color: white;
+        }
+
+        .footer-credits {
+            margin-top: 30px;
+            font-size: 12px;
+            text-align: center;
+            color: #666;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            header {
+                padding: 10px 30px;
+            }
+
+            .movie-list-section {
+                padding: 100px 20px 50px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="navbar">
+            <h1>ProMovieStream</h1>
+        </div>
+    </header>
+
+    <!-- Movie List Section -->
+    <section class="movie-list-section">
+        <div class="movie-grid" id="movie-grid">
+            <!-- Movie cards will be dynamically inserted here -->
+        </div>
+    </section>
+
+    <!-- Modal for Movie Details -->
+    <div id="movie-modal" class="movie-details-modal">
+        <div class="modal-content">
+            <span id="close-modal" class="close">&times;</span>
+            <h2 id="movie-title">Movie Title</h2>
+            <p><strong>Director:</strong> <span id="movie-director"></span></p>
+            <p><strong>Budget:</strong> <span id="movie-budget"></span></p>
+            <p><strong>Hero:</strong> <span id="movie-hero"></span></p>
+            <p><strong>Heroine:</strong> <span id="movie-heroine"></span></p>
+            <p><strong>Release Date:</strong> <span id="movie-release-date"></span></p>
+            <p><strong>Synopsis:</strong> <span id="movie-synopsis"></span></p>
+            <a href="#" id="trailer-link" class="trailer-btn" target="_blank">Watch Trailer</a>
+        </div>
+    </div>
+
+    <!-- Footer Section -->
+    <footer>
+        <ul>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Contact</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Help</a></li>
+        </ul>
+        <div class="footer-credits">
+            &copy; 2024 ProMovieStream. All rights reserved.
+        </div>
+    </footer>
+
+    <!-- JavaScript for Modal Functionality -->
+    <script>
+        // Movie Data Array
+        const movies = [
+            {
+                title: "Devara Part-1 (2024)",
+                director: "Director Name",
+                budget: "$10 Million",
+                hero: "NTR",
+                heroine: "Heroine Name",
+                releaseDate: "september 27, 2024",
+                synopsis: "A gripping tale of adventure and bravery...",
+                trailer: "https://www.youtube.com/watch?v=HNYA6bqL6bU"
+            },
+            {
+                title: "RRR (2022)",
+                director: "S. S. Rajamouli",
+                budget: "$50 Million",
+                hero: "N. T. Rama Rao Jr,K.ram charan",
+                heroine: "Alia Bhatt",
+                releaseDate: "March 25, 2022",
+                synopsis: "An epic action drama set against the backdrop of colonial India...",
+                trailer: "https://www.youtube.com/watch?v=trailer9"
+            },
+            {
+                title: "Aravindha Sametha (2018)",
+                director: "Trivikram Srinivas",
+                budget: "$20 Million",
+                hero: "Jr. NTR",
+                heroine: "Pooja Hegde",
+                releaseDate: "January 12, 2018",
+                synopsis: "A family drama intertwined with action and romance...",
+                trailer: "https://www.youtube.com/watch?v=trailer6"
+            },
+            {
+                title: "Janatha Garage (2016)",
+                director: "Koratala Siva",
+                budget: "$15 Million",
+                hero: "NTR",
+                heroine: "Anushka Shetty",
+                releaseDate: "September 9, 2016",
+                synopsis: "An action-packed drama that explores the life of a mechanic...",
+                trailer: "https://www.youtube.com/watch?app=desktop&v=7O4Hm070Bc8"
+            },
+            {
+                title: "Temper (2015)",
+                director: "Puri Jagannadh",
+                budget: "$12 Million",
+                hero: "Jr. NTR",
+                heroine: "Tridha Choudhury",
+                releaseDate: "April 17, 2015",
+                synopsis: "An intense action drama highlighting corruption and redemption...",
+                trailer: "https://www.youtube.com/watch?v=trailer5"
+            },
+            {
+                title: "veerasimhareedy (2024)",
+                director: "gopichand",
+                budget: "$50 Million",
+                hero:"N.bala krishna",
+                heroine: "shruthi hassan",
+                releaseDate: "March 25, 2022",
+                synopsis: "An epic action drama set against the backdrop of colonial India...",
+                trailer: "https://www.youtube.com/watch?v=XUdcXkvYJs0"
+            },
+            {
+                title: "akanda",
+                director: "boyapati seenu",
+                budget: "$15 Million",
+                hero: "N.bala krishna",
+                heroine: "pragya jaiswal",
+                releaseDate: "September 9, 2016",
+                synopsis: "An action-packed drama that explores the life of a mechanic...",
+                trailer: "https://www.youtube.com/watch?v=CWnu8pQRCkQ"
+            }
+        ];
+
+        // Function to Display Movies
+        function displayMovies() {
+            const movieGrid = document.getElementById('movie-grid');
+            movies.forEach((movie, index) => {
+                const movieCard = document.createElement('div');
+                movieCard.classList.add('movie-card');
+                movieCard.setAttribute('onclick', `showDetails(${index})`);
+
+                // You can add images dynamically or use existing images
+                // For demonstration, using placeholder images
+                // Replace 'movie.image' with actual image URLs if available
+                let imageUrl = "";
+                switch(index) {
+                    case 0:
+                        imageUrl = "https://static.toiimg.com/photo/113734788.cms?imgsize=31084";
+                        break;
+                    case 1:
+                        imageUrl = "https://m.media-amazon.com/images/M/MV5BYjc1MzJiYTMtY2UxNS00NjBjLWJiOWItY2U2MmYwNWQzMzU4XkEyXkFqcGc@._V1_.jpg";
+                        break;
+                    case 2:
+                        imageUrl = "https://static.moviecrow.com/gallery/20180521/139559-Aravinda%20Sametha%20Veera%20Raghava.jpg";
+                        break;
+                    case 3:
+                        imageUrl = "https://m.media-amazon.com/images/M/MV5BNGUyN2ZiOGYtYmFjNi00NGVkLThlMzEtMjdlOGE0ZTgzZGFlXkEyXkFqcGc@._V1_.jpg";
+                        break;
+                    case 4:
+                        imageUrl = "https://upload.wikimedia.org/wikipedia/en/6/64/Temper_film_poster.jpg";
+                        break;
+                    case 5:
+                        imageUrl = "https://upload.wikimedia.org/wikipedia/en/6/61/Veera_Simha_Reddy_poster.jpg";
+                        break;
+                    case 6:
+                        imageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrHP9BhllC5BBZMMrQB6plqQwNpmaPn6kkSQ&s";
+                        break;
+                    default:
+                        imageUrl = "https://via.placeholder.com/200x300";
+                }
+
+                movieCard.innerHTML = `
+                    <img src="${imageUrl}" alt="${movie.title}">
+                    <h3>${movie.title}</h3>
+                `;
+                movieGrid.appendChild(movieCard);
+            });
+        }
+
+        // Function to Show Movie Details in Modal
+        function showDetails(index) {
+            const movie = movies[index];
+            document.getElementById('movie-title').textContent = movie.title;
+            document.getElementById('movie-director').textContent = movie.director;
+            document.getElementById('movie-budget').textContent = movie.budget;
+            document.getElementById('movie-hero').textContent = movie.hero;
+            document.getElementById('movie-heroine').textContent = movie.heroine;
+            document.getElementById('movie-release-date').textContent = movie.releaseDate;
+            document.getElementById('movie-synopsis').textContent = movie.synopsis;
+            document.getElementById('trailer-link').href = movie.trailer;
+
+            // Display the modal
+            document.getElementById('movie-modal').style.display = 'flex';
+        }
+
+        // Function to Close Modal
+        document.getElementById('close-modal').addEventListener('click', () => {
+            document.getElementById('movie-modal').style.display = 'none';
+        });
+
+        // Close modal if user clicks outside of it
+        window.addEventListener('click', (event) => {
+            const modal = document.getElementById('movie-modal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Display movies on page load
+        displayMovies();
+    </script>
+
+</body>
+</html>
